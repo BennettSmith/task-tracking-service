@@ -6,9 +6,9 @@ import (
 
 	"task-tracking-service/internal/adapters/storage/memory"
 	"task-tracking-service/internal/adapters/storage/postgres"
+	"task-tracking-service/internal/adapters/storage/postgres/migrations"
 	"task-tracking-service/internal/config"
 	"task-tracking-service/internal/core/ports"
-	"task-tracking-service/internal/migrations"
 )
 
 // RepositoryType defines the available repository implementations
@@ -38,14 +38,14 @@ func (f *RepositoryFactory) CreateTaskRepository() (ports.TaskRepository, error)
 	case "postgres":
 		if f.db == nil {
 			// Initialize database connection
-			db, err := postgres.NewDB(f.config.Database)
+			db, err := postgres.NewDB(&f.config.Database)
 			if err != nil {
 				return nil, fmt.Errorf("failed to initialize database: %w", err)
 			}
 			f.db = db
 
-			// Run migrations
-			if err := migrations.MigrateDB(db, "migrations"); err != nil {
+			// Run migrations using the internal path
+			if err := migrations.MigrateDB(db, "internal/adapters/storage/postgres/migrations"); err != nil {
 				return nil, fmt.Errorf("failed to run migrations: %w", err)
 			}
 		}

@@ -17,3 +17,5 @@ func IsNotFoundError(err error) bool {
 	_, ok := err.(*NotFoundError)
 	return ok
 }
+
+var ErrTaskNotFound = NewNotFoundError("task not found")

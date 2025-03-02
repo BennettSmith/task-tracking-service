@@ -3,12 +3,11 @@ package postgres
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"fmt"
 	"time"
 
-	"your-module/internal/core/domain"
-	"your-module/internal/core/ports"
+	"task-tracking-service/internal/core/domain"
+	customerrors "task-tracking-service/pkg/errors"
 
 	"github.com/google/uuid"
 )
@@ -24,50 +23,55 @@ func NewTaskRepository(db *sql.DB) *TaskRepository {
 }
 
 // Create stores a new task in the database
-func (r *TaskRepository) Create(ctx context.Context, task domain.Task) (domain.Task, error) {
+func (r *TaskRepository) Create(ctx context.Context, task *domain.Task) error {
 	query := `
 		INSERT INTO tasks (id, title, description, status, created_at, updated_at, due_date)
 		VALUES ($1, $2, $3, $4, $5, $6, $7)
 		RETURNING id, title, description, status, created_at, updated_at, due_date`
 
+	id := uuid.New()
+	now := time.Now()
+	task.ID = id.String()
+	task.CreatedAt = now
+	task.UpdatedAt = now
+
 	row := r.db.QueryRowContext(
 		ctx,
 		query,
-		uuid.New(),
+		task.ID,
 		task.Title,
 		task.Description,
 		task.Status,
-		time.Now(),
-		time.Now(),
+		task.CreatedAt,
+		task.UpdatedAt,
 		task.DueDate,
 	)
 
-	var savedTask domain.Task
 	err := row.Scan(
-		&savedTask.ID,
-		&savedTask.Title,
-		&savedTask.Description,
-		&savedTask.Status,
-		&savedTask.CreatedAt,
-		&savedTask.UpdatedAt,
-		&savedTask.DueDate,
+		&task.ID,
+		&task.Title,
+		&task.Description,
+		&task.Status,
+		&task.CreatedAt,
+		&task.UpdatedAt,
+		&task.DueDate,
 	)
 
 	if err != nil {
-		return domain.Task{}, fmt.Errorf("failed to create task: %w", err)
+		return fmt.Errorf("failed to create task: %w", err)
 	}
 
-	return savedTask, nil
+	return nil
 }
 
-// Get retrieves a task by ID from the database
-func (r *TaskRepository) Get(ctx context.Context, id string) (domain.Task, error) {
+// GetByID retrieves a task by ID from the database
+func (r *TaskRepository) GetByID(ctx context.Context, id string) (*domain.Task, error) {
 	query := `
 		SELECT id, title, description, status, created_at, updated_at, due_date
 		FROM tasks
 		WHERE id = $1`
 
-	var task domain.Task
+	task := &domain.Task{}
 	err := r.db.QueryRowContext(ctx, query, id).Scan(
 		&task.ID,
 		&task.Title,
@@ -79,17 +83,17 @@ func (r *TaskRepository) Get(ctx context.Context, id string) (domain.Task, error
 	)
 
 	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			return domain.Task{}, ports.ErrTaskNotFound
+		if err == sql.ErrNoRows {
+			return nil, customerrors.ErrTaskNotFound
 		}
-		return domain.Task{}, fmt.Errorf("failed to get task: %w", err)
+		return nil, fmt.Errorf("failed to get task: %w", err)
 	}
 
 	return task, nil
 }
 
 // List retrieves all tasks from the database
-func (r *TaskRepository) List(ctx context.Context) ([]domain.Task, error) {
+func (r *TaskRepository) List(ctx context.Context) ([]*domain.Task, error) {
 	query := `
 		SELECT id, title, description, status, created_at, updated_at, due_date
 		FROM tasks
@@ -101,9 +105,9 @@ func (r *TaskRepository) List(ctx context.Context) ([]domain.Task, error) {
 	}
 	defer rows.Close()
 
-	var tasks []domain.Task
+	var tasks []*domain.Task
 	for rows.Next() {
-		var task domain.Task
+		task := &domain.Task{}
 		err := rows.Scan(
 			&task.ID,
 			&task.Title,
@@ -127,7 +131,7 @@ func (r *TaskRepository) List(ctx context.Context) ([]domain.Task, error) {
 }
 
 // Update modifies an existing task in the database
-func (r *TaskRepository) Update(ctx context.Context, task domain.Task) error {
+func (r *TaskRepository) Update(ctx context.Context, task *domain.Task) error {
 	query := `
 		UPDATE tasks
 		SET title = $1, description = $2, status = $3, updated_at = $4, due_date = $5
@@ -153,7 +157,7 @@ func (r *TaskRepository) Update(ctx context.Context, task domain.Task) error {
 	}
 
 	if rowsAffected == 0 {
-		return ports.ErrTaskNotFound
+		return customerrors.ErrTaskNotFound
 	}
 
 	return nil
@@ -174,7 +178,7 @@ func (r *TaskRepository) Delete(ctx context.Context, id string) error {
 	}
 
 	if rowsAffected == 0 {
-		return ports.ErrTaskNotFound
+		return customerrors.ErrTaskNotFound
 	}
 
 	return nil

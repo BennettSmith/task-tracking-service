@@ -71,5 +71,5 @@ func TestNewRepositoryFactory(t *testing.T) {
 	factory := NewRepositoryFactory(cfg)
 
 	assert.NotNil(t, factory)
-	assert.Equal(t, cfg, factory.cfg)
+	assert.Equal(t, cfg, factory.config)
 }

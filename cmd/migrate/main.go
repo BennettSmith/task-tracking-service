@@ -17,7 +17,7 @@ func main() {
 	// Parse command line flags
 	var (
 		command       = flag.String("command", "", "migrate command (up/down)")
-		migrationsDir = flag.String("migrations", "migrations", "migrations directory")
+		migrationsDir = flag.String("migrations", "internal/migrations", "migrations directory")
 	)
 	flag.Parse()
 

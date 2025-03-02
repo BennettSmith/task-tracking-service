@@ -6,8 +6,8 @@ import (
 	"runtime"
 	"testing"
 
-	"your-module/internal/adapters/storage/postgres/migrations"
-	"your-module/internal/config"
+	"task-tracking-service/internal/adapters/storage/postgres/migrations"
+	"task-tracking-service/internal/config"
 )
 
 func SetupTestDB(t *testing.T) *sql.DB {

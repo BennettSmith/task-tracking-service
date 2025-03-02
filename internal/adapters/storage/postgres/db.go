@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"your-module/internal/config"
+	"task-tracking-service/internal/config"
 
 	_ "github.com/lib/pq"
 )
