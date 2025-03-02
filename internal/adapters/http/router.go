@@ -18,7 +18,7 @@ func NewRouter(taskHandler *TaskHandler) *echo.Echo {
 	v1 := api.Group("/v1")
 
 	// Task routes
-	tasks := v1.Group("/tasks")
+	tasks := v1.Group("/task")
 	tasks.POST("", taskHandler.CreateTask)
 	tasks.GET("", taskHandler.ListTasks)
 	tasks.GET("/:id", taskHandler.GetTask)
