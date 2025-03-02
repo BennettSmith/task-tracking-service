@@ -18,17 +18,15 @@ func main() {
 
 	// Create repository factory
 	repoFactory := factory.NewRepositoryFactory(cfg)
+	defer repoFactory.Close()
 
-	// Create task repository
+	// Create task repository using the factory
 	taskRepo, err := repoFactory.CreateTaskRepository()
 	if err != nil {
-		log.Fatalf("Failed to create task repository: %v", err)
+		log.Fatalf("Failed to create repository: %v", err)
 	}
 
-	// Log repository type
-	log.Printf("Using %s task repository", cfg.Repository.Type)
-
-	// Initialize services
+	// Initialize service with the repository from factory
 	taskService := services.NewTaskService(taskRepo)
 
 	// Initialize handlers

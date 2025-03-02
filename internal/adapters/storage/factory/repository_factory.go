@@ -1,11 +1,14 @@
 package factory
 
 import (
+	"database/sql"
 	"fmt"
 
 	"task-tracking-service/internal/adapters/storage/memory"
+	"task-tracking-service/internal/adapters/storage/postgres"
 	"task-tracking-service/internal/config"
 	"task-tracking-service/internal/core/ports"
+	"task-tracking-service/internal/migrations"
 )
 
 // RepositoryType defines the available repository implementations
@@ -18,28 +21,48 @@ const (
 
 // RepositoryFactory creates and configures repositories
 type RepositoryFactory struct {
-	cfg *config.Config
+	config *config.Config
+	db     *sql.DB
 }
 
 // NewRepositoryFactory creates a new repository factory
-func NewRepositoryFactory(cfg *config.Config) *RepositoryFactory {
+func NewRepositoryFactory(config *config.Config) *RepositoryFactory {
 	return &RepositoryFactory{
-		cfg: cfg,
+		config: config,
 	}
 }
 
 // CreateTaskRepository creates a task repository based on configuration
 func (f *RepositoryFactory) CreateTaskRepository() (ports.TaskRepository, error) {
-	repoType := RepositoryType(f.cfg.Repository.Type)
+	switch f.config.Repository.Type {
+	case "postgres":
+		if f.db == nil {
+			// Initialize database connection
+			db, err := postgres.NewDB(f.config.Database)
+			if err != nil {
+				return nil, fmt.Errorf("failed to initialize database: %w", err)
+			}
+			f.db = db
 
-	switch repoType {
-	case MemoryRepository:
+			// Run migrations
+			if err := migrations.MigrateDB(db, "migrations"); err != nil {
+				return nil, fmt.Errorf("failed to run migrations: %w", err)
+			}
+		}
+		return postgres.NewTaskRepository(f.db), nil
+
+	case "memory":
 		return memory.NewTaskRepository(), nil
 
-	case PostgresRepository:
-		return nil, fmt.Errorf("postgres repository not implemented yet")
-
 	default:
-		return nil, fmt.Errorf("unknown repository type: %s", repoType)
+		return nil, fmt.Errorf("unknown repository type: %s", f.config.Repository.Type)
 	}
+}
+
+// Close cleans up any resources (like database connections)
+func (f *RepositoryFactory) Close() error {
+	if f.db != nil {
+		return f.db.Close()
+	}
+	return nil
 }

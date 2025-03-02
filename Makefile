@@ -67,4 +67,15 @@ help:
 	@echo "Usage:"
 	@sed -n 's/^##//p' ${MAKEFILE_LIST} | column -t -s ':' |  sed -e 's/^/ /'
 
-.PHONY: test test-short test-coverage test-coverage-text test-watch test-clean run build clean deps install-tools help 
+.PHONY: test test-short test-coverage test-coverage-text test-watch test-clean run build clean deps install-tools help migrate-up migrate-down migrate-create
+
+# Database migration commands
+migrate-up:
+	go run cmd/migrate/main.go -command up
+
+migrate-down:
+	go run cmd/migrate/main.go -command down
+
+migrate-create:
+	@read -p "Enter migration name: " name; \
+	migrate create -ext sql -dir migrations -seq $$name 
