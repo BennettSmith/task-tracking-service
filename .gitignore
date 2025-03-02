@@ -1,0 +1,39 @@
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Binaries and build output
+bin/
+dist/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Go specific
+*.test
+*.out
+go.work
+
+# IDE specific
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Dependency directories
+vendor/
+
+# Test coverage
+coverage.out
+coverage.html
+
+# Log files
+*.log
+logs/
+
+# Docker volumes
+docker/data/ 

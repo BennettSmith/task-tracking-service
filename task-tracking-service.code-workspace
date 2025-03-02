@@ -1,0 +1,29 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"go.useLanguageServer": true,
+		"go.lintTool": "golangci-lint",
+		"go.formatTool": "gofmt",
+		"editor.formatOnSave": true,
+		"[go]": {
+			"editor.defaultFormatter": "golang.go"
+		},
+		"go.testOnSave": false,
+		"go.testFlags": [
+			"-v"
+		],
+		"go.coverOnSave": true,
+		"go.coverageDecorator": {
+			"type": "highlight",
+			"coveredHighlightColor": "rgba(64,128,128,0.2)",
+			"uncoveredHighlightColor": "rgba(128,64,64,0.2)",
+			"coveredBorderColor": "rgba(64,128,128,0.4)",
+			"uncoveredBorderColor": "rgba(128,64,64,0.4)"
+		},
+		"makefile.configureOnOpen": false
+	}
+}

@@ -1,0 +1,101 @@
+I am building a REST API web service in Go following Clean Architecture principles. I am an experienced software developer, but do not have previous experience with go. I will require help understanding the language and concepts of development using go. I will also need step by step instructions on setting up my development environment.
+
+Domain Requirements - Task Tracking Service:
+
+Core Entities:
+- Task
+  * Unique identifier
+  * Description (required)
+  * Due Date (optional)
+  * Completion Status (boolean)
+  * Created At timestamp
+  * Updated At timestamp
+
+API Endpoints:
+- POST /tasks
+  * Create new task
+  * Required: description
+  * Optional: due date
+- GET /tasks
+  * List all tasks
+  * Query params for filtering:
+    - completed (boolean)
+    - due_before (date)
+    - due_after (date)
+- GET /tasks/{id}
+  * Get single task by ID
+- DELETE /tasks/{id}
+  * Remove task by ID
+- PATCH /tasks/{id}
+  * Update task fields
+  * Supports: description, due date, completion status
+
+Data Validation Rules:
+- Description must not be empty
+- Due date, if provided, must be in the future
+- Timestamps automatically managed by the system
+
+The project includes:
+- HTTP server implementation using the standard "net/http" package
+- RESTful endpoint handlers for CRUD operations
+- JSON request/response handling
+- Basic routing and middleware
+- Error handling and logging
+- Database integration (if needed)
+
+Clean Architecture layers:
+- Entities (domain models, core business rules)
+- Use Cases (application business rules, services)
+- Interface Adapters (controllers, gateways, presenters)
+- Frameworks & Drivers (database, web, external services)
+
+API Specification:
+- Using OpenAPI Specification v3.0.3
+- Code generation from OpenAPI spec
+- Swagger UI for API documentation
+- Contract-first API design approach
+
+Testing requirements:
+- Unit tests for business logic
+- Integration tests for API endpoints
+- Mock interfaces for external dependencies
+- Test coverage reporting
+- BDD-style testing where appropriate
+
+Common packages I might use:
+- "net/http" for HTTP server
+- "encoding/json" for JSON handling
+- "gorilla/mux" for routing (optional)
+- "log" for logging
+- "database/sql" for database operations
+- "testify" for testing and assertions
+- "go-openapi/swag" for OpenAPI tooling
+- "mock/gomock" for mocking in tests
+
+The code should follow Go best practices and idioms, including:
+- Clear error handling
+- Proper package organization
+- Use of interfaces where appropriate
+- Clean separation of concerns
+- Proper naming conventions (e.g., exported names in CamelCase)
+- Dependency injection
+- Interface-driven design
+
+Project structure should reflect Clean Architecture:
+/cmd
+  - Main applications
+/internal
+  /domain
+    - Core business logic and entities
+  /usecase
+    - Application use cases
+  /adapter
+    - Interface adapters
+  /infrastructure
+    - External implementations
+/api
+  - OpenAPI specifications
+/pkg
+  - Public library code
+/test
+  - Test helpers and integration tests
