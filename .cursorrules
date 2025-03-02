@@ -1,4 +1,8 @@
-I am building a REST API web service in Go following Clean Architecture principles. I am an experienced software developer, but do not have previous experience with go. I will require help understanding the language and concepts of development using go. I will also need step by step instructions on setting up my development environment.
+Background:
+* I am building a REST API web service in Go following Clean Architecture principles. 
+* I am an experienced software developer, but do not have previous experience with go. 
+* I will require help understanding the language and concepts of development using go. 
+* I will also need step by step instructions on setting up my development environment.
 
 Domain Requirements - Task Tracking Service:
 
